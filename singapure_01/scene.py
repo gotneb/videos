@@ -1,11 +1,12 @@
+from distutils.util import subst_vars
 from manim import *
 
-class SingapureQuestion(Scene):
+class Guidorizzi(Scene):
     def construct(self):
-        #self.introduce_problem()
-        #self.wait()
-        #self.show_proof()
-        #self.wait()
+        self.introduce_problem()
+        self.wait()
+        self.show_proof()
+        self.wait()
         self.demonstration()
     
 
@@ -19,12 +20,13 @@ class SingapureQuestion(Scene):
         self.play(Write(statement), run_time=5)
         self.wait(2)
         self.play(Write(prove), run_time=5)
+        self.play(Circumscribe(prove))
         self.wait(2)
 
         #self.play(vg.animate.to_edge(UP, buff=SMALL_BUFF))
         self.play(FadeOut(vg, shift=UP))
-        np = NumberPlane()
-        self.play(FadeIn(np))
+        self.np = NumberPlane()
+        self.play(FadeIn(self.np))
 
 
     def show_proof(self):
@@ -79,6 +81,9 @@ class SingapureQuestion(Scene):
         self.play(FadeOut(text), FadeOut(txt), gp.animate.scale(0.5).to_corner(LEFT+ UP, buff=0.3), txt2.animate.to_edge(UP, buff=MED_LARGE_BUFF), run_time=2)
         self.wait(2)
 
+        self.play(Uncreate(self.np))
+        self.wait()
+
         txt3 = Tex(r"Mostremos que a = $\frac{\partial f}{\partial \vec{u}}$ e b = $\frac{\partial f}{\partial \vec{v}}$").set_font_size(40)
         self.play(FadeIn(txt3))
         self.wait(2)
@@ -87,9 +92,51 @@ class SingapureQuestion(Scene):
 
 
     def demonstration(self):
-        lines = [
-            MathTex(r"\nabla f(x, y) \cdot",r"\vec{u}"),
+        equation = [
+            Tex(
+                r"Se $\vec{u} \perp \vec{v} \ \therefore \vec{u} \cdot \vec{v} = 0.$",
+            ),
+            MathTex(
+                r"\nabla f(x, y) ", r"\cdot \vec{u}", r"=\left(a\vec{u} + b\vec{v} \right) ",  r"\cdot \vec{u}",
+            ),
+            MathTex(
+                r"\nabla f(x, y) ", r"\cdot \vec{u}", r"= a\underbrace{(\vec{u} \cdot \vec{u})}_{1} + \underbrace{b(\vec{v} \cdot \vec{u}}_{0})",
+            ),
+            MathTex(
+                r"\nabla f(x, y) ", r"\cdot \vec{u} ", r"=a",
+            ),
         ]
 
-        self.play(Write(lines[0]), run_time=3)
+        vg = VGroup()
+        u_11 = equation[1][1].set_color(BLUE_C)
+        u_13 = equation[1][3].set_color(BLUE_C)
+        for line in equation:
+            #line.set_color_by_tex(vec, BLUE_C)
+            vg.add(line)
+        vg.arrange(DOWN, buff=0.2)
+
+        for tex in equation:
+            self.play(Write(tex), run_time = 2.5)
+            if tex == equation[1]:
+                self.play(Indicate(u_11, color=BLUE_B), Indicate(u_13, color=BLUE_B), run_time=2)
+            self.wait()
         self.wait(2)
+
+        tex = Tex(r"Mas, por definicao \\ $\nabla f(x, y) \cdot \vec{u} = \frac{\partial f}{\partial \vec{u}}(x, y)$")
+        
+        vg.add(tex)
+        vg.arrange(DOWN, buff=0.4)
+        self.play(FadeIn(vg), run_time = 3)
+        self.play(Circumscribe(tex), run_time=2)
+
+        self.wait(2)
+
+
+class HaveFun(Scene):
+    def construct(self):
+        tex = MathTex(
+                r"\nabla f(x, y) ", r"\cdot \vec{u}", r"=\left(a\vec{u} + b\vec{v} \right) ",  r"\cdot \vec{u}",
+        )
+
+        self.play(Indicate(tex, color=PURE_GREEN), run_time=3)
+        self.wait(3)
