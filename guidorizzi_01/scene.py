@@ -1,4 +1,3 @@
-from distutils.util import subst_vars
 from manim import *
 
 class Guidorizzi(Scene):
